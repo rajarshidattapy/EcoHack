@@ -6,7 +6,12 @@ var cors = require('cors');
 const uploadImage = require('./routes/UploadImg');
 const connectToMongo = require('./DB')
 
-app.use(cors())
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://ecohack.vercel.app', 'https://ecohack-frontend.vercel.app'] 
+    : ['http://localhost:3000'],
+  credentials: true
+}))
 app.use(express.json({ limit: "25mb" }));
 
 app.use('/api/auth/ngo', require('./routes/authN'));
@@ -14,9 +19,13 @@ app.use('/api/auth/res', require('./routes/authR'));
 app.use('/api/auth/user', require('./routes/authU'));
 app.use('/api/auth/res', require('./routes/Mailer'));
 
+// Health check endpoint for Render
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', message: 'Server is running' });
+});
 
 connectToMongo();
-const port = process.env.PORT
+const port = process.env.PORT || 5000
 
 //code to convert images into url by using the cloudinary version 2 
 app.post("/uploadImage", (req, res) => {
@@ -32,5 +41,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(port, () => {
-  console.log(`App listening `)
+  console.log(`App listening on port ${port}`)
 })

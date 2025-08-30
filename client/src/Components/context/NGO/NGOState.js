@@ -1,37 +1,29 @@
-import NGOContext from './NGOContext';
-import { useState} from 'react';
+import NGOContext from './NGOContext'
+import { useState } from 'react'
+import API_BASE_URL from '../../../config/api'
 
 export default function NGOState(props) {
-  const host = 'http://localhost:5000';
-  const NGOInitial = [];
+  const NGOInitial = []
 
+  const [NGO, setNGO] = useState(NGOInitial)
 
-  const [NGO, setNGO] = useState(NGOInitial);
+  //Add a note
 
-  // Function to fetch NGOs related to a specific email
-  const getNGO = async (email) => {
-    try {
-      const response = await fetch(`${host}/api/auth/ngo/fetchallngo?email=${encodeURIComponent(email)}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch NGOs: ${response.statusText}`);
-      }
-
-      const json = await response.json();
-      setNGO(json);
-    } catch (error) {
-      console.error(error.message);
-    }
-  };
+  const getNGO=async(email)=>{
+    // console.log("inside get NGO" , email);
+    const response = await fetch(`${API_BASE_URL}/api/auth/ngo/fetchallngo?email=${encodeURIComponent(email)}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const json = await response.json();
+    setNGO(json)
+  }
 
   return (
-    <NGOContext.Provider value={{ getNGO, NGO }}>
+    <NGOContext.Provider value={{ getNGO ,NGO}}>
       {props.children}
     </NGOContext.Provider>
-  );
+  )
 }
